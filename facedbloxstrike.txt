@@ -19525,3 +19525,63 @@ getgenv()["\101\52\108\51\103\52\110\116\95\111\119\110\115\95\116\104\105\115"]
 	return
 end
 e4l44gant77()
+-- MOBILE FIX: tạo nút toggle menu cho mobile
+local UIS = game:GetService("UserInputService")
+if UIS.TouchEnabled then
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    
+    -- tạo nút
+    local btn = Instance.new("TextButton")
+    btn.Text = "☰"
+    btn.Size = UDim2.new(0, 45, 0, 45)
+    btn.Position = UDim2.new(0, 10, 0.5, -22)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 22
+    btn.BorderSizePixel = 0
+    btn.ZIndex = 999
+    btn.Active = true
+    btn.Draggable = true
+
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 8)
+
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Color = Color3.fromRGB(80, 80, 80)
+    stroke.Thickness = 1
+
+    btn.Parent = LocalPlayer.PlayerGui:WaitForChild("RobloxGui") 
+        or game:GetService("CoreGui")
+
+    -- click = toggle menu
+    btn.MouseButton1Click:Connect(function()
+        if getgenv().ToggleMenuVisibility then
+            getgenv().ToggleMenuVisibility()
+        end
+    end)
+
+    -- drag support
+    local dragging, dragStart, startPos
+    btn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = btn.Position
+        end
+    end)
+    btn.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - dragStart
+            btn.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    btn.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+end
